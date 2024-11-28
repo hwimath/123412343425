@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>어근 : 강할 강 (强) - 초등어휘 단어 게임</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #FFFAF0;
+            color: #333;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: #FF69B4;
+        }
+        .hidden {
+            display: none;
+        }
+        .section {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .button {
+            background-color: #FF69B4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 15px 5px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #FF1493;
+        }
+        .quiz-option {
+            display: block;
+            text-align: left;
+            margin: 10px 0;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        #score {
+            font-size: 24px;
+            color: #32CD32;
+        }
+        #incorrectAnswers {
+            text-align: left;
+            margin-top: 20px;
+        }
+        #incorrectAnswers p {
+            color: #FF4500;
+        }
+    </style>
+</head>
+<body>
+
+<h1>✨ 어근 : 강할 강 (强) - 초등어휘 단어 게임 ✨</h1>
+
+<div id="studySection" class="section">
+    <div id="studyContent">
+        <!-- Study content will be injected here -->
+    </div>
+    <button class="button" id="nextStudyBtn">다음</button>
+</div>
+
+<div id="quizSection" class="section hidden">
+    <h2>단어 퀴즈</h2>
+    <div id="quizContent">
+        <!-- Quiz content will be injected here -->
+    </div>
+    <button class="button" id="nextQuizBtn">다음</button>
+    <button class="button hidden" id="submitQuizBtn">제출</button>
+</div>
+
+<div id="scoreSection" class="section hidden">
+    <h2>🎉 점수 🎉</h2>
+    <p id="score">0 / 10</p>
+    <div id="incorrectAnswers">
+        <!-- Incorrect answers will be displayed here -->
+    </div>
+    <button class="button" onclick="location.reload()">다시 하기</button>
+</div>
+
+<script>
+// 데이터 정의
+const words = [
+    { word: "강력", definition: "힘이나 영향이 강하고 세다." },
+    { word: "강화", definition: "더 강하게 함." },
+    { word: "강제", definition: "억지로 시킴." },
+    { word: "강행", definition: "어려움에도 불구하고 억지로 행함." },
+    { word: "강압", definition: "강한 힘으로 억누름." },
+    { word: "강도", definition: "강한 정도나 세기." },
+    { word: "강박", definition: "마음속에 어떤 생각이 강하게 자리 잡음." },
+    { word: "강인", definition: "매우 강하고 굳셈." },
+    { word: "강성", definition: "힘이 강하고 왕성함." },
+    { word: "강탈", definition: "남의 것을 강제로 빼앗음." }
+];
+
+const sentences = {
+    "강력": [
+        "그는 강력한 힘을 가지고 있다.",
+        "강력한 태풍이 접근하고 있다.",
+        "이 약은 통증을 강력하게 완화한다."
+    ],
+    "강화": [
+        "체력을 강화하기 위해 운동을 한다.",
+        "학교에서는 안전 교육을 강화했다.",
+        "법률을 강화하여 범죄를 줄였다."
+    ],
+    "강제": [
+        "그는 일을 강제로 시켰다.",
+        "강제 퇴거 명령이 내려졌다.",
+        "아이에게 강제로 음식을 먹이지 마세요."
+    ],
+    "강행": [
+        "그들은 계획을 강행했다.",
+        "비가 와도 행사를 강행할 것이다.",
+        "반대에도 불구하고 정책을 강행했다."
+    ],
+    "강압": [
+        "강압적인 방법은 좋지 않다.",
+        "그는 강압에 굴복하지 않았다.",
+        "강압으로 문제를 해결하려 했다."
+    ],
+    "강도": [
+        "운동의 강도를 높였다.",
+        "이 소리는 강도가 너무 세다.",
+        "빛의 강도를 조절했다."
+    ],
+    "강박": [
+        "그는 청소에 대한 강박이 있다.",
+        "강박 관념을 버려야 한다.",
+        "강박적인 행동을 보였다."
+    ],
+    "강인": [
+        "그는 강인한 정신력을 가지고 있다.",
+        "강인한 사람만이 성공한다.",
+        "그녀는 강인한 성격의 소유자다."
+    ],
+    "강성": [
+        "강성 노동조합이 파업을 시작했다.",
+        "그는 강성 리더로 알려져 있다.",
+        "강성의 자세로 문제에 임했다."
+    ],
+    "강탈": [
+        "도둑이 귀중품을 강탈했다.",
+        "그는 돈을 강탈당했다.",
+        "강탈 행위는 범죄이다."
+    ]
+};
+
+const quizQuestions = [
+    {
+        question: "1. 체력을 ____하기 위해 운동을 한다.",
+        options: ["강화", "강압"],
+        correctAnswer: "강화"
+    },
+    {
+        question: "2. 그는 청소에 대한 ____이 있다.",
+        options: ["강박", "강도"],
+        correctAnswer: "강박"
+    },
+    {
+        question: "3. 비가 와도 행사를 ____할 것이다.",
+        options: ["강행", "강탈"],
+        correctAnswer: "강행"
+    },
+    {
+        question: "4. 도둑이 귀중품을 ____했다.",
+        options: ["강탈", "강박"],
+        correctAnswer: "강탈"
+    },
+    {
+        question: "5. 그는 ____적인 방법은 좋지 않다고 말했다.",
+        options: ["강압", "강도"],
+        correctAnswer: "강압"
+    },
+    {
+        question: "6. 그는 ____한 정신력을 가지고 있다.",
+        options: ["강인", "강제"],
+        correctAnswer: "강인"
+    },
+    {
+        question: "7. 이 소리는 ____가 너무 세다.",
+        options: ["강박", "강도"],
+        correctAnswer: "강도"
+    },
+    {
+        question: "8. 아이에게 음식을 ____로 먹이지 마세요.",
+        options: ["강행", "강제로"],
+        correctAnswer: "강제로"
+    },
+    {
+        question: "9. 그는 ____한 힘을 가지고 있다.",
+        options: ["강력", "강탈"],
+        correctAnswer: "강력"
+    },
+    {
+        question: "10. 그는 ____ 리더로 알려져 있다.",
+        options: ["강성", "강인"],
+        correctAnswer: "강성"
+    }
+];
+
+// 상태 변수
+let currentWordIndex = 0;
+let currentQuizIndex = 0;
+let score = 0;
+let incorrectAnswers = [];
+
+// 초기화 함수
+function showDefinition() {
+    if (currentWordIndex < words.length) {
+        const word = words[currentWordIndex];
+        document.getElementById('studyContent').innerHTML = `
+            <h2>단어 뜻 배우기 (어근: 강할 강)</h2>
+            <h3>${word.word}</h3>
+            <p>${word.definition}</p>
+        `;
+    } else {
+        // 모든 단어 학습이 끝나면 퀴즈 시작
+        document.getElementById('studySection').classList.add('hidden');
+        initQuiz();
+        document.getElementById('quizSection').classList.remove('hidden');
+    }
+}
+
+function showSentences() {
+    const word = words[currentWordIndex];
+    const sentenceList = sentences[word.word];
+    let sentencesHTML = `<h2>예문 배우기 (어근: 강할 강)</h2><h3>${word.word}</h3>`;
+    sentenceList.forEach(sentence => {
+        sentencesHTML += `<p>• ${sentence}</p>`;
+    });
+    document.getElementById('studyContent').innerHTML = sentencesHTML;
+}
+
+// 버튼 이벤트 리스너
+document.getElementById('nextStudyBtn').addEventListener('click', () => {
+    if (document.getElementById('studyContent').innerHTML.includes('단어 뜻 배우기')) {
+        showSentences();
+    } else {
+        currentWordIndex++;
+        showDefinition();
+    }
+});
+
+// 퀴즈 함수
+function initQuiz() {
+    if (currentQuizIndex < quizQuestions.length) {
+        const q = quizQuestions[currentQuizIndex];
+        document.getElementById('quizContent').innerHTML = `
+            <p>${q.question}</p>
+            ${q.options.map((option, index) => `
+                <label class="quiz-option">
+                    <input type="radio" name="quiz${currentQuizIndex}" value="${option}">
+                    ${option}
+                </label>
+            `).join('')}
+        `;
+        // Toggle buttons
+        if (currentQuizIndex === quizQuestions.length - 1) {
+            document.getElementById('nextQuizBtn').classList.add('hidden');
+            document.getElementById('submitQuizBtn').classList.remove('hidden');
+        } else {
+            document.getElementById('nextQuizBtn').classList.remove('hidden');
+        }
+    }
+}
+
+document.getElementById('nextQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        initQuiz();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+document.getElementById('submitQuizBtn').addEventListener('click', () => {
+    const q = quizQuestions[currentQuizIndex];
+    const selected = document.querySelector(`input[name="quiz${currentQuizIndex}"]:checked`);
+    if (selected) {
+        if (selected.value === q.correctAnswer) {
+            score++;
+        } else {
+            incorrectAnswers.push({
+                question: q.question,
+                yourAnswer: selected.value,
+                correctAnswer: q.correctAnswer
+            });
+        }
+        currentQuizIndex++;
+        showScore();
+    } else {
+        alert("답을 선택해주세요!");
+    }
+});
+
+function showScore() {
+    document.getElementById('quizSection').classList.add('hidden');
+    document.getElementById('score').innerText = `${score} / ${quizQuestions.length}`;
+    if (incorrectAnswers.length > 0) {
+        let incorrectHTML = "<h3>틀린 문제</h3>";
+        incorrectAnswers.forEach(item => {
+            incorrectHTML += `
+                <p><strong>문제:</strong> ${item.question}</p>
+                <p><strong>당신의 답:</strong> ${item.yourAnswer}</p>
+                <p><strong>정답:</strong> ${item.correctAnswer}</p>
+                <hr>
+            `;
+        });
+        document.getElementById('incorrectAnswers').innerHTML = incorrectHTML;
+    } else {
+        document.getElementById('incorrectAnswers').innerHTML = "<p>모든 문제를 맞추셨습니다! 훌륭해요! 🎉</p>";
+    }
+    document.getElementById('scoreSection').classList.remove('hidden');
+}
+
+// 초기화 시작
+showDefinition();
+</script>
+
+</body>
+</html>
